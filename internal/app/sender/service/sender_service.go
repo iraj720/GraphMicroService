@@ -33,6 +33,7 @@ func (ss *senderService) Healthz() (interface{}, error) {
 func (ss *senderService) SendRequest(data string) error {
 	_, err := ss.client.Send(context.Background(), &reciever.GraphDataRequest{Data: data})
 	if err != nil {
+		// TODO : handling connection failures
 		return err
 	}
 	return nil

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
 
@@ -18,37 +19,9 @@ const (
 
 var count = 0
 
-func main() {
+func server() {
 	rc := controller.NewRecieverController()
 
-	// e := echo.New()
-	// e.GET("/healthz", func(c echo.Context) error {
-	// 	count++
-	// 	fmt.Println(count)
-	// 	return c.String(http.StatusOK, "Im UP")
-	// })
-	// e.Use(middleware.Recover())
-
-	// rc.RegisterRoutes(e)
-
-	// err := e.Start(fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
-	// if err != nil {
-	// 	logrus.Fatalf("unable to unable to run web server: %v", err)
-	// }
-	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
-	// if err != nil {
-	// 	log.Fatalf("failed to listen: %v", err)
-	// }
-
-	// reciever.RegisterRecieverServer(rc, reciever.UnimplementedRecieverServer{})
-
-	// grpcServer := grpc.NewServer()
-
-	// reiever.RegisterChatServiceServer(grpcServer, &s)
-
-	// if err := grpcServer.Serve(lis); err != nil {
-	// 	log.Fatalf("failed to serve: %s", err)
-	// }
 	lis, err := net.Listen(SERVER_TYPE, fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -59,4 +32,26 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+func client() {
+
+}
+
+func Register(cmd *cobra.Command) {
+	var reciever = &cobra.Command{
+		Use:       "reciever",
+		Short:     "reciever recieves from sender and sends to broker. its client will start sending requests whenever they achieved",
+		ValidArgs: []string{"server", "client"},
+		Args:      cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			serverOrClient := args[0]
+			if serverOrClient == "server" {
+				server()
+			} else if serverOrClient == "client" {
+				client()
+			}
+		},
+	}
+	cmd.AddCommand(reciever)
 }
