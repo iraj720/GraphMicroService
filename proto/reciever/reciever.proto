@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option go_package = "graph/proto/reciever";
+
+package helloworld;
+
+// The greeting service definition.
+service Reciever {
+  rpc Send (GraphDataRequest) returns (GraphDataResponse) {}
+}
+
+// The request message containing the user's name.
+message GraphDataRequest {
+  string data = 1;
+}
+
+// The response message containing the greetings
+message GraphDataResponse {
+  string message = 1;
+}
