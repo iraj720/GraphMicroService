@@ -9,12 +9,16 @@ service Reciever {
   rpc Send (GraphDataRequest) returns (GraphDataResponse) {}
 }
 
-// The request message containing the user's name.
 message GraphDataRequest {
-  string data = 1;
+  string  data = 1;
 }
 
-// The response message containing the greetings
 message GraphDataResponse {
-  string message = 1;
+  string  message = 1;
+}
+
+message GraphData{
+  int64   id = 1;
+  string  data = 2;
+  int64   Status = 3;
 }

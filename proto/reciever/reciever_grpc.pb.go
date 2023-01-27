@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: reciever.proto
+// source: reciever/reciever.proto
 
 package reciever
 
@@ -101,5 +101,5 @@ var Reciever_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "reciever.proto",
+	Metadata: "reciever/reciever.proto",
 }

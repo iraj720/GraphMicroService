@@ -4,40 +4,56 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
-const (
-	SERVER_HOST = "localhost"
-	SERVER_PORT = "9988"
-	SERVER_TYPE = "tcp"
-)
+type destinationController struct {
+}
 
-func StartServing() {
-	fmt.Println("Server Running...")
-	server, err := net.Listen(SERVER_TYPE, SERVER_HOST+":"+SERVER_PORT)
+func NewDestinationController() *destinationController {
+	return &destinationController{}
+}
+
+func (bc *destinationController) StartServing(ServerHost string, ServerPort string, ServerType string) {
+	fmt.Println("Server Running... On ", ServerHost, ":", ServerPort)
+	server, err := net.Listen(ServerType, ServerHost+":"+ServerPort)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
+	t1 := time.Now()
 	defer server.Close()
-	i := 0
+	count := 0
+	defer func() {
+		var s chan os.Signal
+		signal.Notify(s, syscall.SIGTERM)
+		<-s
+		fmt.Printf("number of recieved messages : %d", count)
+	}()
+	go func() {
+		for {
+			time.Sleep(2 * time.Second)
+			fmt.Println(time.Since(t1), " count ", count, " req/s ", count/int(time.Since(t1).Seconds()))
+		}
+	}()
+	buffer := make([]byte, 100000)
 	for {
 		connection, err := server.Accept()
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
 		}
-		fmt.Printf("client connected %d\n", i)
-		go processClient(connection)
-		i++
+
+		//fmt.Printf("client connected %d\n", i)
+		for {
+			_, err := connection.Read(buffer)
+			if err != nil {
+				fmt.Println("Error reading:", err.Error())
+				break
+			}
+			count++
+		}
 	}
-}
-func processClient(connection net.Conn) {
-	buffer := make([]byte, 1024)
-	mLen, err := connection.Read(buffer)
-	if err != nil {
-		fmt.Println("Error reading:", err.Error())
-	}
-	fmt.Println("Received: ", string(buffer[:mLen]))
-	connection.Write([]byte("Thanks! Got your message:" + string(buffer[:mLen])))
 }

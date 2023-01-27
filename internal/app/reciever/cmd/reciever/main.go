@@ -1,8 +1,11 @@
-package main
+package reciever
 
 import (
 	"fmt"
 	"graph/internal/app/reciever/controller"
+	"graph/internal/app/reciever/service"
+	"graph/pkg/data_handler"
+	socketclient "graph/pkg/socket_client"
 	"graph/proto/reciever"
 	"log"
 	"net"
@@ -15,13 +18,20 @@ const (
 	SERVER_HOST = "localhost"
 	SERVER_PORT = "9988"
 	SERVER_TYPE = "tcp"
+	CLIENT_HOST = "localhost"
+	CLIENT_PORT = "9989"
 )
 
 var count = 0
 
-func server() {
-	rc := controller.NewRecieverController()
-
+func main() {
+	sc := socketclient.NewSocketClient(CLIENT_HOST, CLIENT_PORT, SERVER_TYPE)
+	mdh := data_handler.NewMemoryDataHandler(false, 0)
+	dh := data_handler.NewDataHandler(mdh)
+	rs := service.NewRecieverService(sc, dh)
+	rc := controller.NewRecieverController(rs)
+	rc.StartSending()
+	rs.StartHandlingFailedRequests()
 	lis, err := net.Listen(SERVER_TYPE, fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -34,23 +44,12 @@ func server() {
 	}
 }
 
-func client() {
-
-}
-
 func Register(cmd *cobra.Command) {
 	var reciever = &cobra.Command{
-		Use:       "reciever",
-		Short:     "reciever recieves from sender and sends to broker. its client will start sending requests whenever they achieved",
-		ValidArgs: []string{"server", "client"},
-		Args:      cobra.ExactArgs(1),
+		Use:   "reciever",
+		Short: "reciever recieves from sender and sends to broker. its client will start sending requests whenever they achieved",
 		Run: func(cmd *cobra.Command, args []string) {
-			serverOrClient := args[0]
-			if serverOrClient == "server" {
-				server()
-			} else if serverOrClient == "client" {
-				client()
-			}
+			main()
 		},
 	}
 	cmd.AddCommand(reciever)

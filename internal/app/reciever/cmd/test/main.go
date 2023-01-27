@@ -1,15 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"graph/internal/app/reciever/controller"
-	"graph/proto/reciever"
-	"log"
-	"net"
-
-	"google.golang.org/grpc"
-)
-
 const (
 	SERVER_HOST = "localhost"
 	SERVER_PORT = "9988"
@@ -17,18 +7,18 @@ const (
 )
 
 func main() {
-	rc := controller.NewRecieverController()
+	// rc := controller.NewRecieverController()
 
-	lis, err := net.Listen(SERVER_TYPE, fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	reciever.RegisterRecieverServer(s, rc)
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	// lis, err := net.Listen(SERVER_TYPE, fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
+	// if err != nil {
+	// 	log.Fatalf("failed to listen: %v", err)
+	// }
+	// s := grpc.NewServer()
+	// reciever.RegisterRecieverServer(s, rc)
+	// log.Printf("server listening at %v", lis.Addr())
+	// if err := s.Serve(lis); err != nil {
+	// 	log.Fatalf("failed to serve: %v", err)
+	// }
 
 	// fmt.Println("Server Running...")
 	// server, err := net.Listen(SERVER_TYPE, SERVER_HOST+":"+SERVER_PORT)
@@ -43,7 +33,7 @@ func main() {
 	// 	if err != nil {
 	// 		fmt.Println("Error accepting: ", err.Error())
 	// 		os.Exit(1)
-	// 	}
+	// Println()
 	// 	fmt.Printf("client connected %d\n", i)
 	// 	go processClient(connection)
 	// 	i++

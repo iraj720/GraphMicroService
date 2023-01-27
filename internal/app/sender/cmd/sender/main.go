@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"graph/internal/app/sender/client"
 	"graph/internal/app/sender/service"
+	"graph/pkg/data_handler"
 	"graph/proto/reciever"
 	"log"
 
@@ -25,9 +26,11 @@ func main() {
 	}
 	defer conn.Close()
 	c := reciever.NewRecieverClient(conn)
-	ss := service.NewSenderService(c)
+	mdh := data_handler.NewMemoryDataHandler(true, 100000)
+	ss := service.NewSenderService(c, data_handler.NewDataHandler(mdh))
 	sc := client.NewSenderClient(ss)
 	sc.StartSending()
+
 }
 
 func Register(cmd *cobra.Command) {

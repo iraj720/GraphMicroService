@@ -9,10 +9,8 @@ const (
 	TransferState_FAILED    TransferState = 1
 )
 
-type graphData struct {
+type GraphData struct {
 	ID            int64
 	Content       []byte
 	TransferState TransferState
 }
-
-

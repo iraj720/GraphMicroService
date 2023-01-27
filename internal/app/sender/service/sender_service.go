@@ -2,38 +2,33 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"graph/pkg/data_handler"
 	"graph/proto/reciever"
 )
 
-const (
-	SERVER_HOST = "localhost"
-	SERVER_PORT = "9988"
-	SERVER_TYPE = "tcp"
-)
-
 type SenderService interface {
-	Healthz() (interface{}, error)
-	SendRequest(data string) error
+	SendRequest() error
 }
 
 type senderService struct {
-	client reciever.RecieverClient
+	rc reciever.RecieverClient
+	dh data_handler.DataHandler
 }
 
-func NewSenderService(client reciever.RecieverClient) SenderService {
+func NewSenderService(client reciever.RecieverClient, dataHandler data_handler.DataHandler) SenderService {
 
-	return &senderService{client: client}
+	return &senderService{rc: client, dh: dataHandler}
 }
 
-func (ss *senderService) Healthz() (interface{}, error) {
-	return "", fmt.Errorf("")
-}
-
-func (ss *senderService) SendRequest(data string) error {
-	_, err := ss.client.Send(context.Background(), &reciever.GraphDataRequest{Data: data})
+func (ss *senderService) SendRequest() error {
+	gd, err := ss.dh.ReadData()
+	if err != nil {
+		return err
+	}
+	_, err = ss.rc.Send(context.Background(), &reciever.GraphDataRequest{Data: string(gd.Content)})
 	if err != nil {
 		// TODO : handling connection failures
+		ss.dh.WriteData(gd)
 		return err
 	}
 	return nil

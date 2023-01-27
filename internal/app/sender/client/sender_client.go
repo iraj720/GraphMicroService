@@ -3,14 +3,8 @@ package client
 import (
 	"fmt"
 	"graph/internal/app/sender/service"
-	"math/rand"
+	"sync"
 	"time"
-)
-
-const (
-	SERVER_HOST = "localhost"
-	SERVER_PORT = "9988"
-	SERVER_TYPE = "tcp"
 )
 
 type SenderClient struct {
@@ -22,39 +16,41 @@ func NewSenderClient(ss service.SenderService) SenderClient {
 }
 
 func (sc *SenderClient) StartSending() {
-	max := 50000
-	min := 8
+
 	count := 0
 	gosStarted := 0
+	gosNeeded := 100
 
 	t1 := time.Now()
-	endTimeChannel := make(chan int)
-	for i := 0; i < 1; i++ {
-		go func() {
-			timeCh := time.After(time.Second * 2)
-		l2:
-			for {
-				select {
-				case <-timeCh:
-					endTimeChannel <- 1
-					break l2
-				default:
-					number := rand.Int31n(int32(max-min)) + int32(min)
-					// 8 B - 5 KB data
-					str := make([]byte, number)
-					err := sc.ss.SendRequest(string(str))
-					if err != nil {
-						fmt.Println(err)
-					} else {
-						count++
-					}
-				}
+	wg := sync.WaitGroup{}
+	for i := 0; i < gosNeeded; i++ {
+		gosStarted++
+		wg.Add(1)
 
+		defer wg.Done()
+		go func() {
+			// runtime.LockOSThread()
+			// defer runtime.UnlockOSThread()
+			// data := "hello"
+
+			for {
+				err := sc.ss.SendRequest()
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					count++
+				}
+				//time.Sleep(100 * time.Millisecond)
 			}
 
 		}()
+
 	}
-	fmt.Println(time.Since(t1), " ", gosStarted)
-	<-endTimeChannel
-	fmt.Println(time.Since(t1), " gos ", gosStarted, " count ", count)
+	go func() {
+		for {
+			time.Sleep(2 * time.Second)
+			fmt.Println(time.Since(t1), " goroutines ", gosStarted, " count ", count, " req/s ", count/int(time.Since(t1).Seconds()))
+		}
+	}()
+	wg.Wait()
 }
