@@ -8,7 +8,7 @@ type DataHandler interface {
 	// it will write data to end of the ds
 	WriteData(gd *GraphData) error
 
-	// if data_handler has ran in withMockData mode its len is constant else it is 0 and will grow based on your writes
+	// if data_handler has run in withMockData mode its len is constant else it is 0 and will grow based on your writes
 	Size() int64
 }
 
