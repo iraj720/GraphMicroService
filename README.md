@@ -26,7 +26,7 @@ with creating more goroutines we are just making more context switchings not mor
 3. using runtime.lockOSThread
 4. implement the DATA_HANDLER better and remove memory and disk footprints there are ofc so much better tools these days (s3, seaweed, ceph)
 5. use redis streams or temporal so data integrity and availablity will be easily achieved
-6. writing it with CPP and handle memory by your self ;)
+6. writing it with CPP : use real OS threads and handle memory by your self ;)
 
 
 
