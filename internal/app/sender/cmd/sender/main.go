@@ -26,7 +26,7 @@ func main() {
 	}
 	defer conn.Close()
 	c := reciever.NewRecieverClient(conn)
-	mdh := data_handler.NewMemoryDataHandler(true, 100000)
+	mdh := data_handler.NewMemoryDataHandler(true, 10000000)
 	ss := service.NewSenderService(c, data_handler.NewDataHandler(mdh))
 	sc := client.NewSenderClient(ss)
 	sc.StartSending()
