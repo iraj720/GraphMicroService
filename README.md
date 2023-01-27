@@ -21,11 +21,12 @@ run the app with these following steps :
 
 so many other optimization can be made :
 1. using config.yaml
-2. running them on 4 different machine (it will make the speed up to 4 times faster beacuse the limitaion is threads and their open sockets)
-with creating more goroutine we are just making more context switchings not more cpu efficiency
+2. running them on 4 different machine (it will make it faster at least 4 times. beacuse the limitaion is on threads and their open sockets)
+with creating more goroutines we are just making more context switchings not more cpu efficiency
 3. using runtime.lockOSThread
 4. implement the DATA_HANDLER better and remove memory and disk footprints there are ofc so much better tools these days (s3, seaweed, ceph)
 5. use redis streams or temporal so data integrity and availablity will be easily achieved
+6. writing it with CPP and handle memory by your self ;)
 
 
 
