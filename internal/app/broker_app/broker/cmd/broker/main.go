@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"fmt"
 	"graph/internal/app/broker_app/broker/controller"
 	"graph/internal/app/broker_app/broker/service"
 	"graph/internal/app/broker_app/logger"
@@ -9,6 +8,7 @@ import (
 	socketclient "graph/pkg/socket_client"
 	"os"
 
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -29,7 +29,7 @@ func main() {
 	bs := service.NewBrokerService(sc, dh)
 	f, err := os.OpenFile("broker_app_logger.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
-		fmt.Printf("error opening file: %v", err)
+		logrus.Fatalf("error opening file: %v", err)
 	}
 	loger := log.New()
 	loger.Out = f
@@ -38,7 +38,10 @@ func main() {
 	bc := controller.NewBrokerController(logger.NewGraphLogger(loger), bs)
 	bs.StartHandlingFailedRequests()
 
-	bc.StartServing(SERVER_HOST, SERVER_PORT, SERVER_TYPE)
+	err = bc.StartServing(SERVER_HOST, SERVER_PORT, SERVER_TYPE)
+	if err != nil {
+		logrus.Fatalf("cannot start serving %v", err)
+	}
 }
 
 func Register(root *cobra.Command) {

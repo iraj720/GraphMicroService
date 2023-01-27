@@ -30,7 +30,6 @@ func main() {
 	dh := data_handler.NewDataHandler(mdh)
 	rs := service.NewRecieverService(sc, dh)
 	rc := controller.NewRecieverController(rs)
-	rc.StartSending()
 	rs.StartHandlingFailedRequests()
 	lis, err := net.Listen(SERVER_TYPE, fmt.Sprintf("%s:%s", SERVER_HOST, SERVER_PORT))
 	if err != nil {

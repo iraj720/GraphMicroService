@@ -3,10 +3,9 @@ package controller
 import (
 	"fmt"
 	"net"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type destinationController struct {
@@ -16,22 +15,16 @@ func NewDestinationController() *destinationController {
 	return &destinationController{}
 }
 
-func (bc *destinationController) StartServing(ServerHost string, ServerPort string, ServerType string) {
+func (dc *destinationController) StartServing(ServerHost string, ServerPort string, ServerType string) error {
 	fmt.Println("Server Running... On ", ServerHost, ":", ServerPort)
 	server, err := net.Listen(ServerType, ServerHost+":"+ServerPort)
 	if err != nil {
-		fmt.Println("Error listening:", err.Error())
-		os.Exit(1)
+		return err
 	}
-	t1 := time.Now()
 	defer server.Close()
+
+	t1 := time.Now()
 	count := 0
-	defer func() {
-		var s chan os.Signal
-		signal.Notify(s, syscall.SIGTERM)
-		<-s
-		fmt.Printf("number of recieved messages : %d", count)
-	}()
 	go func() {
 		for {
 			time.Sleep(2 * time.Second)
@@ -42,11 +35,9 @@ func (bc *destinationController) StartServing(ServerHost string, ServerPort stri
 	for {
 		connection, err := server.Accept()
 		if err != nil {
-			fmt.Println("Error accepting: ", err.Error())
-			os.Exit(1)
+			logrus.Info("cannot accept connection")
+			continue
 		}
-
-		//fmt.Printf("client connected %d\n", i)
 		for {
 			_, err := connection.Read(buffer)
 			if err != nil {

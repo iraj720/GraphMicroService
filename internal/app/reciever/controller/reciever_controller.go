@@ -15,23 +15,11 @@ type RecieverController struct {
 }
 
 func NewRecieverController(socketService service.RecieverService) *RecieverController {
-	return &RecieverController{ss: socketService, ch: make(chan string, 1000)}
+	return &RecieverController{ss: socketService}
 }
 
 func (rc *RecieverController) Send(ctx context.Context, in *reciever.GraphDataRequest) (*reciever.GraphDataResponse, error) {
 	log.Printf("Received: %v", in.Data)
 	go rc.ss.SendRequest(&data_handler.GraphData{Content: []byte(in.Data)})
-	//rc.ch <- in.Data
 	return &reciever.GraphDataResponse{Message: "Hello"}, nil
-}
-
-func (rc *RecieverController) StartSending() {
-	for i := 0; i < 10; i++ {
-		go func() {
-			for {
-				data := <-rc.ch
-				rc.ss.SendRequest(&data_handler.GraphData{Content: []byte(data)})
-			}
-		}()
-	}
 }

@@ -3,6 +3,7 @@ package destination
 import (
 	"graph/internal/app/destination/controller"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -13,8 +14,11 @@ const (
 )
 
 func main() {
-	bc := controller.NewDestinationController()
-	bc.StartServing(SERVER_HOST, SERVER_PORT, SERVER_TYPE)
+	dc := controller.NewDestinationController()
+	err := dc.StartServing(SERVER_HOST, SERVER_PORT, SERVER_TYPE)
+	if err != nil {
+		logrus.Fatalf("cannot start serving %v", err)
+	}
 }
 
 func Register(cmd *cobra.Command) {
